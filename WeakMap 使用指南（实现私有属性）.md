@@ -76,7 +76,7 @@ m.has(c); // false
 - （2）全局注册 Symbol —— `Symbol(description)`，`Symbol.for(key)`如果在全局注册中未查找到对应的 symbol 也会全局注册。
 - （3）[内置 Symbol](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Symbol#%E5%86%85%E7%BD%AE%E9%80%9A%E7%94%A8%EF%BC%88well-known%EF%BC%89symbol)
 
-![Description](/static/images/2025/9/110723-562023957.png)
+![Description](/images/weakmap_symbol.png)
 
 ## 为什么通过 WeakMap 实现私有化成员？
 
