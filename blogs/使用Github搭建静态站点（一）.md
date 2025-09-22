@@ -1,0 +1,84 @@
+---
+layout: post
+date: 2025-09-22
+---
+
+# 使用 Github 搭建静态站点（一）
+
+阿里云服务器到期了，给博客数据做备份也麻烦，想着直接用静态站点得了
+
+-----
+    
+### 使用自定义域名代替 `USERNAME.github.io` 
+
+首先需要在 **Github —> 右上角用户头像 —> Settings —> 左侧 Code, planning, and automation —> Pages —> Add a domain 添加自定义域名**
+
+（注：题主这里用的是阿里云的域名，需要提前购买和备案。当然想省力还是使用 Github 给的默认域名 `USERNAME.github.io`）
+
+![image.png](/images/site/image.png)
+
+然后，让你添加一条 DNS TXT 记录：
+
+![image.png](/images/site/image%201.png)
+
+这时，需要去阿里云的 【云解析 DNS/ 权威域名解析/ 解析设置】添加解析记录：
+
+（1）添加TXT
+
+![image.png](/images/site/image%202.png)
+
+将前面 Github 提供的 hostname 和 TXT 填入，其他值默认即可：
+
+![image.png](/images/site/image%203.png)
+
+点击确定后即可在记录列表中添加一条：
+
+![image.png](/images/site/image%204.png)
+
+返回 Github Pages，点击 Verify 按钮。显示添加的域名已经验证成功
+
+![image.png](/images/site/image%205.png)
+
+官方提示使用 `dig _github-pages-challenge-USERNAME.example.com +nostats +nocomments +nocmd TXT` 命令来验证你的DNS 是否成功解析，题主是 Windows 系统，使用 `nslookup -type=TXT -query=TXT _github-pages-challenge-USERNAME.example.com` 命令进行查询。（USERNAME 替换成你的 Github 用户名，不分大小写，example.com 替换成你的真实域名）。
+
+如果存在该解析记录会返回 TXT：
+
+![image.png](/images/site/image%206.png)
+
+否则就是返回”找不到：_github-pages-challenge-USERNAME.example.com: Non-existent domain“。
+
+（2）添加 CNAME
+
+同样，按照前述方式添加一条 CNAME，指向到 `USERNAME.github.io` 域名。也就是当通过设置的自定义域 `www.xxx.com` 去访问Github部署的静态站点时，会指向 `USERNAME.github.io` 域下的内容，但是配置了自定义域后就无法直接通过 `USERNAME.github.io` 访问站点了。
+
+![image.png](/images/site/image%207.png)
+
+这里官方给了几种配置 DNS 解析的方式：
+
+![image.png](/images/site/image%208.png)
+
+这里我们配置子域，你也可以配置顶点域，单独配置子域虽然在为项目设置自定义域验证时会对顶点域配置进行警告，但是实际上并不影响通过子域进行访问。（DNS valid for primary：顶点域 is improperly configured）
+
+[管理 GitHub Pages 站点的自定义域 - GitHub 文档](https://docs.github.com/zh/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site)
+
+域名添加成功，然后就可以配置到你的 Github 静态站点项目中使用。
+
+假设这里新建一个项目来专门写博客内容：
+
+点击 Github 右上角 + ，create New Reporistory
+
+![image.png](/images/site/image%209.png)
+
+![image.png](/images/site/image%2010.png)
+
+填写相关配置：
+
+![image.png](/images/site/image%2011.png)
+
+这里可以使用前面配置好的自定义域名，官方推荐使用 www 子域名，前面只要主域（顶点域）验证通过了，子域是可以直接使用的。
+
+自定义域名需要进行验证，验证只要不是 ERROR 就可以了。自定义域名添加成功后会在项目根目录自动创建一个 CNAME 文件，内容就是一个自定义域
+
+这里Github会自动部署（需要等一会，等 Github Actions 部署完成），点击 Visit Site 访问网站。然后就可以看到页面展示 README 文件中的内容。然后可以直接编辑 README.md 或 index.md 或者将项目拉取到本地，进行更新和提交。
+
+![image.png](/images/site/image%2012.png)
