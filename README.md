@@ -2,7 +2,7 @@
 
 ## 9月
 
-- [使用Github搭建静态站点（一）](/blogs/使用Github搭建静态站点（一）.md)
+- [使用 Github 搭建静态站点（一）](/blogs/使用Github搭建静态站点（一）.md)
 - [WeakMap 使用指南（实现私有属性）](/blogs/WeakMap使用指南（实现私有属性）.md)
 - [编码规范工程化 —— Commitlint](/blogs/编码规范工程化——Commitlint.md)
 
