@@ -1,6 +1,6 @@
 ---
 layout: default
-tags: "lint"
+tags: "Lint"
 ---
 
 # Commitlint

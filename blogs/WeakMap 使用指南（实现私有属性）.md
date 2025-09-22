@@ -1,3 +1,8 @@
+---
+layout: default
+tags: "Js"
+---
+
 # WeakMap 使用指南（实现私有属性）
 最近在读 ESLint 的源码的时候，看到作者在实例化 ESLint 类的时候会将一些变量存储到 WeakMap 中，觉得这个用法应该好好记录一下。这里研究一下为什么使用 WeakMap 来进行存储，以及哪些变量/数据需要使用 WeakMap 进行存储，学习一下 WeakMap 的使用场景。
 

@@ -1,3 +1,8 @@
+---
+layout: default
+tags: "Js"
+---
+
 # Worker 之 SharedWorker 初探 —— 多个页面间共享资源
 
 **实现多个 tab 页面间的通信方式**有很多种，比如：

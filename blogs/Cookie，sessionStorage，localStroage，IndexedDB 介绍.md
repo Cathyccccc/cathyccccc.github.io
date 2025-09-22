@@ -1,3 +1,8 @@
+---
+layout: default
+tags: "Js"
+---
+
 # Cookie，sessionStorage，localStroage，IndexedDB 介绍
 
 参考链接：

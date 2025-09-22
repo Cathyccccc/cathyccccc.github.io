@@ -1,3 +1,8 @@
+---
+layout: default
+tags: "Vue"
+---
+
 # Vue3 —— 使用 provide 和 inject 实现父组件和后代组件通信
 
 Vue 官方文档
