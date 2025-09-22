@@ -1,10 +1,15 @@
 ---
 layout: post
+title: 语义化版本 （SemVer）
 date: 2025-07-29
 tags: Js
+previous:
+  title: 导入并导出目录下模块文件的方法&使用桶文件的后果
+  url: /blogs/导入并导出目录下模块文件的方法&使用桶文件的后果.md
+next:
+  title: Cookie，sessionStorage，localStorage，IndexedDB 介绍
+  url: /blogs/Cookie，sessionStorage，localStorage，IndexedDB介绍.md
 ---
-
-<!-- # 语义化版本 （SemVer） -->
 
 #### 版本格式：
 Major.Minor.Patch（主版本号.次版本号.修订号）

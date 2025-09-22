@@ -1,9 +1,43 @@
-<h1>{{ page.title }}</h1>
-<small>{{ page.date | date: "%-d %B %Y" }}</small>
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: "zh_CN" }}">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-{% if page.tags %}
-  <small>tags: <em>{{ page.tags | join: "` - `" }}</em></small>
-{% endif %}
+{% seo %}
+    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+    {% include head-custom.html %}
+  </head>
+  <body>
+    <div class="wrapper">
+      <h1>{{ page.title }}</h1>
+      <small>{{ page.date | date: "%-d %B %Y" }}</small>
 
-{{content}}
+      {% if page.tags %}
+      <small>tags: <code>{{ page.tags | array_to_sentence_string }}</code></small>
+      {% endif %}
+      
+      {{content}}
 
+      <div class="post-navigation">
+        {% if page.previous %} 
+        <a href="{{ page.previous.url | relative_url }}">
+          <small>← 上一篇：</small>
+          {{ page.previous.title }}</a>
+        {% endif %}
+
+        {% if page.next %} |
+        <a href="{{ page.next.url | relative_url }}">
+          <small>下一篇: →</small>
+          {{ page.next.title }}
+        </a>
+        {% endif %}
+      </div>
+    </div>
+    <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
+  </body>
+</html>

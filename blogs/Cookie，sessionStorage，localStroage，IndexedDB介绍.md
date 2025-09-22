@@ -1,10 +1,15 @@
 ---
 layout: post
+title: Cookie，sessionStorage，localStorage，IndexedDB 介绍
 date: 2025-08-01
 tags: Js
+previous:
+  title: 语义化版本（SemVer）
+  url: /blogs/语义化版本（SemVer）.md
+next:
+  title: 面试题：500条数据渲染加载卡顿（分页），不能使用懒加载、虚拟滚动，如何解决？
+  url: /blogs/面试题：500条数据渲染加载卡顿（分页），不能使用懒加载、虚拟滚动，如何解决？.md
 ---
-
-<!-- # Cookie，sessionStorage，localStorage，IndexedDB 介绍 -->
 
 参考链接：
 

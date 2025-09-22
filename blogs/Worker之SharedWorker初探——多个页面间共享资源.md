@@ -1,10 +1,15 @@
 ---
 layout: post
+title: Worker 之 SharedWorker 初探 —— 多个页面间共享资源
 date: 2025-07-25
 tags: Js
+previous:
+  title: 手把手实现 Select 组件
+  url: /blogs/手把手实现Select组件.md
+next:
+  title: 导入并导出目录下模块文件的方法&使用桶文件的后果
+  url: /blogs/导入并导出目录下模块文件的方法&使用桶文件的后果.md
 ---
-
-<!-- # Worker 之 SharedWorker 初探 —— 多个页面间共享资源 -->
 
 **实现多个 tab 页面间的通信方式**有很多种，比如：
 

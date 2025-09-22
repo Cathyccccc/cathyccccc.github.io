@@ -1,10 +1,15 @@
 ---
 layout: post
+title: 手把手实现 Select 组件
 date: 2025-07-22
 tags: Vue
+previous:
+  title: Vue3 —— 使用 provide 和 inject 实现父组件和后代组件通信
+  url: /blogs/Vue3——使用provide和inject实现父组件和后代组件通信.md
+next: 
+  title: Worker 之 SharedWorker 初探 —— 多个页面间共享资源
+  url: /blogs/Worker之SharedWorker初探——多个页面间共享资源.md
 ---
-
-<!-- # 手把手实现 Select 组件 -->
 
 在写个人博客这个网站的时候，手动实现了几个 UI 组件的封装，觉得 Select 组件还是有些点可以拿出来说一说的。
 

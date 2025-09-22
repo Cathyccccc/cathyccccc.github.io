@@ -1,10 +1,15 @@
 ---
 layout: post
+title: 狂神 —— Docker 学习笔记（一）
 date: 2025-08-27
 tags: Server
+previous:
+  title: Bug —— 首次加载页面，向后端发起请求时返回502，再次发起请求时成功
+  url: /blogs/Bug——首次加载页面，向后端发起请求时返回502，再次发起请求时成功.md
+next:
+  title: 狂神 —— Docker 学习笔记（二）
+  url: /blogs/狂神——Docker学习笔记（二）.md
 ---
-
-<!-- # 狂神 —— Docker 学习笔记（一） -->
 
 只要学不死，就往死里学。   —— 狂神 🤷‍♀️
 

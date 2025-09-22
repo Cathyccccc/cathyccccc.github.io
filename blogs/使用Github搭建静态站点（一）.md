@@ -1,10 +1,12 @@
 ---
 layout: post
+title: 使用 Github 搭建静态站点（一）
 date: 2025-09-22
 tags: GitHub
+previous:
+	title: 编码规范工程化 —— Commitlint
+  url: /blogs/编码规范工程化——Commitlint.md
 ---
-
-<!-- # 使用 Github 搭建静态站点（一） -->
 
 阿里云服务器到期了，给博客数据做备份也麻烦，想着直接用静态站点得了
 

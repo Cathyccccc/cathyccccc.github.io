@@ -1,10 +1,15 @@
 ---
 layout: post
+title: 狂神 —— Docker 学习笔记（二）
 date: 2025-08-27
 tags: Server
+previous:
+	title: 狂神 —— Docker学习笔记（一）
+  url: /blogs/狂神——Docker学习笔记（一）.md
+next:
+	title: 编码规范工程化 —— Commitlint
+  url: /blogs/编码规范工程化——Commitlint.md
 ---
-
-<!-- # 狂神 —— Docker 学习笔记（二） -->
 
 ## 容器管理可视化面板
 

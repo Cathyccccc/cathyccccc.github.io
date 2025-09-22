@@ -1,10 +1,15 @@
 ---
 layout: post
+title: 编码规范工程化 —— Commitlint
 date: 2025-09-17
 tags: 工程化
+previous:
+  title: 狂神 —— Docker 学习笔记（二）
+  url: /blogs/狂神——Docker学习笔记（二）.md
+next:
+  title: WeakMap 使用指南（实现私有属性）
+  url: /blogs/WeakMap使用指南（实现私有属性）.md
 ---
-
-<!-- # Commitlint -->
 
 为了更好地理解和使用 commitlint 及其相关生态，今天特意花了一上午时间读 commitlint 的源码，这里做一个学习记录，方便后续回顾。
 

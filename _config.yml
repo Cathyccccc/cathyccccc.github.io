@@ -1,7 +1,18 @@
+lsi: false
+safe: true
+source: .
+incremental: false
+highlighter: rouge
+gist:
+  noscript: false
+kramdown:
+  math_engine: mathjax
+  syntax_highlighter: rouge
+profile: true
+
 title: 赵星的个人博客
 logo: /images/avatar.jpg
 description: 
 # show_downloads: true
 # google_analytics:
 theme: jekyll-theme-minimal
-# favicon: /images/favicon.svg

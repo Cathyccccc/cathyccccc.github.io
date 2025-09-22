@@ -1,10 +1,12 @@
 ---
 layout: post
+title: Vue3 —— 使用 provide 和 inject 实现父组件和后代组件通信
 date: 2025-07-21
 tags: Vue
+next:
+  title: 手把手实现 Select 组件
+  url: /blogs/手把手实现Select组件.md
 ---
-
-<!-- # Vue3 —— 使用 provide 和 inject 实现父组件和后代组件通信 -->
 
 Vue 官方文档
 

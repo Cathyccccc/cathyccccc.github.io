@@ -12,7 +12,7 @@
 - [狂神 —— Docker 学习笔记（一）](/blogs/狂神——Docker学习笔记（一）.md)
 - [Bug——首次加载页面，向后端发起请求时返回502，再次发起请求时成功](/blogs/Bug——首次加载页面，向后端发起请求时返回502，再次发起请求时成功.md)
 - [面试题：500条数据渲染加载卡顿（分页），不能使用懒加载、虚拟滚动，如何解决？](/blogs/面试题：500条数据渲染加载卡顿（分页），不能使用懒加载、虚拟滚动，如何解决？.md)
-- [Cookie，sessionStorage，localStorage，IndexedDB 介绍](/blogs/Cookie，sessionStorage，localStroage，IndexedDB介绍.md)
+- [Cookie，sessionStorage，localStorage，IndexedDB 介绍](/blogs/Cookie，sessionStorage，localStorage，IndexedDB介绍.md)
 
 ## 7月
 
