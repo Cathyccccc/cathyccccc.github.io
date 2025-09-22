@@ -1,9 +1,10 @@
 ---
-layout: default
-tags: "Js"
+layout: post
+date: 2025-07-29
+tags: Js
 ---
 
-# 语义化版本 （SemVer）
+<!-- # 语义化版本 （SemVer） -->
 
 #### 版本格式：
 Major.Minor.Patch（主版本号.次版本号.修订号）

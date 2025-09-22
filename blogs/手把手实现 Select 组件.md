@@ -1,9 +1,10 @@
 ---
-layout: default
-tags: "Vue"
+layout: post
+date: 2025-07-22
+tags: Vue
 ---
 
-# 手把手实现 Select 组件
+<!-- # 手把手实现 Select 组件 -->
 
 在写个人博客这个网站的时候，手动实现了几个 UI 组件的封装，觉得 Select 组件还是有些点可以拿出来说一说的。
 

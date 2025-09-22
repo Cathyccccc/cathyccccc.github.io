@@ -1,9 +1,10 @@
 ---
-layout: default
-tags: "Js"
+layout: post
+date: 2025-08-01
+tags: Js
 ---
 
-# Cookie，sessionStorage，localStroage，IndexedDB 介绍
+<!-- # Cookie，sessionStorage，localStorage，IndexedDB 介绍 -->
 
 参考链接：
 

@@ -1,9 +1,10 @@
 ---
 layout: post
-tags: "Lint"
+date: 2025-09-17
+tags: 工程化
 ---
 
-# Commitlint
+<!-- # Commitlint -->
 
 为了更好地理解和使用 commitlint 及其相关生态，今天特意花了一上午时间读 commitlint 的源码，这里做一个学习记录，方便后续回顾。
 

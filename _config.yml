@@ -1,7 +1,7 @@
 title: 赵星的个人博客
-logo: https://avatars.githubusercontent.com/u/76764328?v=4&size=64
+logo: /images/avatar.jpg
 description: 
 # show_downloads: true
 # google_analytics:
 theme: jekyll-theme-minimal
-# /images/favicon.svg
+# favicon: /images/favicon.svg

@@ -1,7 +1,5 @@
 # 2025年
 
-[test](/test.md)
-
 ## 9月
 
 - [使用Github搭建静态站点（一）](/blogs/使用Github搭建静态站点（一）.md)

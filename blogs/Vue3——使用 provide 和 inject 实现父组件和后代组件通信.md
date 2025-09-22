@@ -1,9 +1,10 @@
 ---
-layout: default
-tags: "Vue"
+layout: post
+date: 2025-07-21
+tags: Vue
 ---
 
-# Vue3 —— 使用 provide 和 inject 实现父组件和后代组件通信
+<!-- # Vue3 —— 使用 provide 和 inject 实现父组件和后代组件通信 -->
 
 Vue 官方文档
 
