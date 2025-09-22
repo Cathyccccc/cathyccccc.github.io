@@ -1,0 +1,208 @@
+# Vue3 —— 使用 provide 和 inject 实现父组件和后代组件通信
+
+Vue 官方文档
+
+- [组合式 API：依赖注入](https://cn.vuejs.org/api/composition-api-dependency-injection.html#composition-api-dependency-injection)
+- [依赖注入](https://cn.vuejs.org/guide/components/provide-inject.html#provide-inject)
+- [为 provide / inject 标注类型](https://cn.vuejs.org/guide/typescript/composition-api.html#typing-provide-inject)
+------------------------------------
+
+Vue 中父子组件通信的方式有很多种，这里对其中一种方式 provide 和 inject 做简单的研究。
+
+## 基本用法介绍
+
+### 1. provide
+    
+提供一个值，可以被后代组件注入。
+    
+```js
+provide(key, value);
+```
+
+#### 参数
+
+`key`
+
+注入的 key，用于表示唯一性。可以是一个字符串或 Symbol 。
+
+`value`
+
+要注入的值。
+
+### 2. inject
+
+注入祖先组件或通过 `app.provide(key, value)` 提供的值。
+
+```js
+const value = inject(key, defaultValue, treatDefaultAsFactory);
+```
+
+#### 参数
+
+`key`
+
+注入的 key。Vue 会遍历父组件链，找到 key 所对应的值。当链上多个父组件对同一个 key 提供了值时，会采取**就近原则**，选取离子组件最近的值。
+
+`defaultValue`
+
+可选。在父组件链上没有找到 key 对应的值提供时，会使用**默认值**。如果 inject 没有提供默认值，则默认值为 **undefined** 。默认值可以是一个工厂函数，详见第三个参数。
+
+`treatDefaultAsFactory`
+
+可选。是否将默认值视作工厂函数，布尔值。为 `true` 时，默认值将作为工厂函数被调用，函数的返回值作为 inject 的默认值。**这是为了避免在用不到默认值的情况下进行不必要的计算或产生副作用。**
+
+#### 示例
+
+```js
+// 父组件
+import { ref, provide } from "vue";
+const count = ref(0);
+provide(count, count);
+// 或者 main.js
+app.provide(count, 0);
+
+// 子组件
+import  { inject } from "vue";
+const count = inject("count");
+console.log(count); // 0
+```
+
+### 存在的问题
+
+项目中过多使用 provide 和 inject 时，会造成数据来源不清晰、注入 `key` 冲突（重复）以及重复时上层值会被覆盖的问题。
+
+### 解决方式
+
+#### 1. 解决 `key` 冲突问题：
+
+官方推荐[使用 Symbol 作为注入名](https://cn.vuejs.org/guide/components/provide-inject.html#working-with-symbol-keys)，并在一个单独的文件中导出这些注入名。
+
+```js
+// key.js
+export const myInjectionKey1 = Symbol();
+export const myInjectionKey2 = Symbol();
+
+// 父组件
+import { provide } from "vue";
+import { myInjectionKey1 } from "./key.js";
+provide(myInjectionKey1, "hello world");
+
+// 子组件
+import { inject } from "vue";
+import { myInjectionKey1 } from "./key.js";
+const value = inject(myInjectionKey1);
+```
+
+#### 2. 同步注入类型
+
+同时，结合 [Vue 提供的 `InjectionKey` 接口](https://cn.vuejs.org/guide/typescript/composition-api.html#typing-provide-inject)，在提供者和消费者之间同步注入值的类型。
+
+```js
+// key.js
+import type { InjectionKey } from "vue";
+export const myInjectionKey1 = Symbol('key1') as InjectionKey<string>;
+export const myInjectionKey2: InjectionKey<string> = Symbol('key2');
+
+// 父组件
+import { provide } from "vue";
+import { myInjectionKey1 } from "./key.js";
+provide(myInjectionKey1, "hello world"); // √ 提供的值类型符合 InjectionKey 类型，为 string 类型
+provide(myInjectionKey2, 10); // × 提供的值类型不符合 InjectionKey 类型，应为 string 类型但提供的值为 number 类型
+```
+
+#### 3. 要求父组件链必须提供注入值
+
+默认情况下，如果父组件链没有提供 `inject` 所需的注入值，则会使用默认值。但有些情况下必须要求父组件提供注入值，通常是一些 UI 组件的封装。例如 `<FormItem>` 组件必须在 `<Form>` 组件中使用，因此 `<Form>` 组件必须将部分外界传递进来的值传递给 `<FormItem>` 组件进行使用。
+
+这时，我们可以在 `inject` 时做一下判断，如果没有 `inject` 所需的注入值，抛出错误。
+
+```js
+import { inject } from "vue";
+const value = inject(myInjectionKey);
+if (!value) {
+  throw new Error(`Provide 需提供 ${myInjectionKey} 的注入值`)；
+}
+```
+
+#### 4. 进一步优化
+
+将上述 `if` 判断封装成一个函数，每次需要使用 `inject` 时直接调用函数即可。
+
+```js
+declare function injectStrict<T>(key: InjectionKey<T>, defaultValue?: T | (() => T), treatDefaultAsFactory?: boolean) : T;
+function injectStrict(key, defaultValue, treatDefaultAsFactory) {
+  const value = inject(key, defaultValue, treatDefaultAsFactory);
+  if (!value) {
+    throw new Error(`Count not resolve ${key}`);
+  }
+  return value;
+}
+```
+
+### 个人理解
+
+尽量在层级关系和依赖关系比较明确的组件间使用。例如使用 `app.provide()` 提供全局数据，或者在封装业务组件如 `<Form>` 和 `<FormItem>` 类似层级关系明确的组件间传递数据。
+
+这里以 `<Form>` 和 `<FormItem>` 组件进行举例，外界传递给 `<Form>` 组件的样式相关属性需要进一步传递给 `<FormItem>` 组件进行使用：
+
+```js
+// Form.vue
+<template>
+  <form :class="formClass" :style="{width}">
+    <slot></slot>
+  </form>
+</template>
+
+<script setup>
+import { provide, computed } from 'vue';
+
+const props = defineProps({
+  wrapperCol: Object,
+  labelCol: Object,
+  layout: {
+    type: String,
+    default: "horizontal"
+  },
+  labelAlign: {
+    type: String,
+    default: 'right'
+  },
+  // ... 其他属性
+});
+
+provide('wrapperCol', props.wrapperCol);
+provide('labelCol', props.labelCol);
+provide('layout', props.layout);
+provide('labelAlign', props.labelAlign);
+
+// ...
+</script>
+```
+
+```js
+// FormItem.vue
+<template>
+  <div :class="formItemClass">
+    <label
+      :for="$attrs.name"
+      :class="['shrink-0', 'mr-4', labelAlign === 'right' ? 'text-right' : 'text-left']"
+      :style="{ width: `${(labelCol.span / (labelCol.span + wrapperCol.span)) * 100}%` }"
+      >{{ $attrs.label }}</label
+    >
+    <div class="w-full"><slot></slot></div>
+  </div>
+</template>
+
+<script setup>
+import { inject } from "vue";
+
+const wrapperCol = inject("wrapperCol");
+const labelCol = inject("labelCol");
+const layout = inject("layout", "horizontal"); // 默认布局为水平布局
+const labelAlign = inject("labelAlign", "right"); // 默认标签对齐方式为右对齐
+
+// ...
+</script>
+```
+
+当然，实际代码应结合上述优化后的方式进行使用，此处只是举例说明 provide 和 inject 的使用场景。

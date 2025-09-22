@@ -1,0 +1,798 @@
+# Commitlint
+
+为了更好地理解和使用 commitlint 及其相关生态，今天特意花了一上午时间读 commitlint 的源码，这里做一个学习记录，方便后续回顾。
+
+---
+
+官方文档地址：
+
+[commitlint](https://commitlint.js.org/)
+
+## 开始
+
+### 安装
+
+    `pnpm add -D @commitlint/cli @commitlint/config-conventional`
+
+### 配置
+
+项目根目录下创建 commitlint.config.js 文件，添加内容：
+
+```js
+export default {
+  extends: ["@commitlint/config-convertional"],
+};
+```
+
+## 使用
+
+### 添加钩子
+
+使用 commitlint 需要设置 commit-msg 钩子（目前不支持 pre-commit 钩子）
+
+#### 1. 使用 Git 钩子管理器
+
+可以使用第三方库 husky 提供的 commit-msg 钩子
+
+> husky: Git 钩子管理器
+>
+> commitizen: 提供交互式界面，使用户可以选择 commit 的内容
+>
+> cz-git：commitizen 的增强版适配器，为 commitzen 提供更强大、更符合中文开发者习惯的提问流程
+>
+> lint-staged: 只 lint 更改的文件
+
+##### （1）安装 husky
+
+    `npm install -D husky`
+
+##### （2）生成脚本文件
+
+```bash
+ # 在.husky/ 目录下创建 pre-commit 脚本文件
+ npx husky init
+ # 在 .husky/ 目录下创建 commit-msg 脚本文件
+ echo npx --no commitlint --edit $1 > .husky/commit-msg
+```
+
+##### 示例
+
+```bash
+#/usr/bin/env sh
+npx --no commitlint --edit $1
+# --no 只运行本地已安装的命令，禁止 npx 自动安装缺失的包
+# --edit：read last commit message from the specified file or fallbacks to ./.git/COMMIT_EDITMSG
+# $1 Git传入的提交信息
+```
+
+> `#!` (Shebang) 通常出现在类 Unix 系统的脚本中第一行，作为前两个字符。
+>
+> 在 Shebang 之后，可以有一个或多个空白字符，后接解释器的绝对路径，用于指明执行这个脚本文件的解释器。
+>
+> 例如，以执行 `#!/bin/sh` 开头的文件，在执行时会实际调用 `/bin/sh` 程序，通常是 Bourne shell 或兼容的 shell，例如 bash、dash 等。
+>
+> 使用 `#!/usr/bin/env` 是一种常见的在不同平台上都能正确找到解释器的办法。因为 env 一般固定在 /usr/bin 目录下，而其余解释器的安装位置就相对不那么固定。
+
+##### （3）提交
+
+```bash
+git commit -m "commit_msg"
+```
+
+此时，会触发 husky 执行脚本文件。
+
+#### 2. git hooks
+
+##### 客户端钩子
+
+######(1) Committing-Workflow Hooks（由 `git commit` 命令触发）
+
+- pre-commit 用于检查代码（lint）
+- prepare-commit-msg
+- commit-msg
+- post-commit
+
+(2) Emial Workflow Hooks（由 `git am` 命令触发）
+
+- applypatch-msg
+- pre-applypatch
+- post-applypatch
+
+(3) Other Client Hooks
+
+- pre-rebase
+- post-rewrite
+- post-checkout
+- post-merge
+- pre-push
+- pre-auto-gc
+
+##### 服务端钩子
+
+- pre-receive
+- update
+- post-receive
+
+### 测试
+
+检查最后一次提交：
+
+```bash
+npx commitlint --from HEAD~1 --to HEAD --verbose
+```
+
+`--verbose`：没有任何错误时会返回：“No staged files match any of provided globs.”。默认情况下如果 commitlint 成功则不返回任何内容提示。
+
+## CI 设置
+
+### GitHub Actions
+
+```yaml
+name: CI
+on: [push, pull_request]
+
+jobs:
+	commitlint:
+		runs-on: ubuntu-22.04
+		steps:
+			- uses: actions/checkout@v3
+				with:
+					fetch-depth: 0 # 表示会检查所有历史提交
+			- name: Install required dependencies
+				run: |
+					apt update # 刷新软件包索引列表
+					apt install -y sudo # 安装 sudo 命令
+					sudo apt install -y git curl # 安装 git，curl
+					curl -sL https://deb.nodesource.com/s/etup_14.x | sudo -E bash - # 添加 NodeSource 的 Node.js 14.x 软件源到系统
+					sudo DEBIAN_FRONTEND=nointeractive apt install -y nodejs # 安装 node.js
+			- name: Print versions
+				run: |
+					git --version
+					node --version
+					npm --version
+					npx commitlint --version
+			- name: Install commitlint
+				run: |
+					npm install conventional-changelog-conventionalcommits
+					npm install commitlint@latest
+			- name: Validate current commit (last commit) with commitlint
+				if: github.event_name == 'push'
+				run: npx commitlint --last --verbose
+			- name: Validate PR commits with commitlint
+				if: github.event_name == 'pull_request'
+				run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+```
+
+## 交互式提示
+
+以下包有助于快速编写提交消息，并确保其遵循 `commitlint.config.js` 中配置的提交约定。
+
+### 1. `@commitlint/prompt-cli`
+
+（1）安装
+
+    `npm install -D @commitlint-prompt-cli`
+
+（2）在 package.json 中添加脚本
+
+```json
+{
+  "scripts": {
+    "commit": "commit"
+  }
+}
+```
+
+（3）运行
+
+```json
+npm run commit
+```
+
+### 2. `commitizen` + `cz-git` (适配器)
+
+插件化思想：你可以理解为 commitizen 提供了一个基座，这个基座可以扩展其他插件（适配器）来增强功能。例如 Vue 和 Vue Router，Babel 生态等。
+
+（1）安装
+
+```bash
+npm install -D commitizen cz-git
+```
+
+（2）在 package.json 中配置 `config` 指定使用的适配器，添加脚本：
+
+```json
+{
+  "scripts": {
+    "commit": "git-cz"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git"
+    }
+  }
+}
+```
+
+（3）在 `commitlint.config.js` 中配置交互式命令提示模板：
+
+```jsx
+export default {
+  prompt: {
+    messages: {},
+    questions: {
+      type: {},
+    },
+  },
+};
+```
+
+如果使用 commitizen 作为交互，则 commitlint.config.js 中 `parserPreset` 建议设置成 `conventional-changelog-conventionalcommits` ，这是因为 commitizen 在使用第三方包 `semantic-release` 来自动管理包版本时，配置的规则预设是 “conventionalcommits”，详见 `commitizen/cz-cli` 的 package.json 文件（截图如下）。
+
+![Description](/images/commitlint_1.png)
+
+### 其他：
+
+#### @commitlint/cz-commitlint
+
+受 cz-conventional-changelog 包中提交规范的启发，提供的一种更现代的交互方式。需要和 commitizen 或者 prompt 结合使用，也是一种适配器。
+
+## CLI
+
+```bash
+❯ npx commitlint --help
+
+@commitlint/cli@19.5.0 - Lint your commit messages
+
+[input] reads from stdin if --edit, --env, --from and --to are omitted
+
+Options:
+# 切换是否给输出内容添加颜色（使用第三方包 chalk）
+  -c, --color          toggle colored output           [boolean] [default: true]
+# 使用的 commitlint 配置文件（commitlint.config.js）的路径
+  -g, --config         path to the config file; result code 9 if config is
+                       missing                                          [string]
+# 打印配置文件到终端
+      --print-config   print resolved config
+                                          [string] [choices: "", "text", "json"]
+# 设置工作目录
+  -d, --cwd            directory to execute in
+                                         [string] [default: (Working Directory)]
+# 读取最近一次的提交信息（某个明确的文件或者 ./.git/COMMIT_EDITMSG 文件）
+  -e, --edit           read last commit message from the specified file or
+                       fallbacks to ./.git/COMMIT_EDITMSG               [string]
+# 根据给定的环境变量检查 ❓
+  -E, --env            check message in the file at path given by environment
+                       variable value                                   [string]
+# 设置共享配置列表（extends字段）
+  -x, --extends        array of shareable configurations to extend       [array]
+# 设置错误信息中的帮助地址（一般就是commitlint官网）
+  -H, --help-url       help url in error message                        [string]
+# 设置 commitlint 范围的起始提交，edit需为false
+  -f, --from           lower end of the commit range to lint; applies if
+                       edit=false                                       [string]
+      --from-last-tag  uses the last tag as the lower end of the commit range to
+                       lint; applies if edit=false and from is not set [boolean]
+      --git-log-args   additional git log arguments as space separated string,
+                       example '--first-parent --cherry-pick'           [string]
+# 只lint上一次的提交，edit需为false
+  -l, --last           just analyze the last commit; applies if edit=false
+                                                                       [boolean]
+# 格式化输出
+  -o, --format         output format of the results                     [string]
+# 配置解析器预设（parserPreset 字段）
+  -p, --parser-preset  configuration preset to use for
+                       conventional-commits-parser                      [string]
+# 是否显示控制台输出（简单输出模式）
+  -q, --quiet          toggle console output          [boolean] [default: false]
+# 设置 commitlint 范围的终止提交，edit需为false
+  -t, --to             upper end of the commit range to lint; applies if
+                       edit=false                                       [string]
+# 当提交符合规范时，提示提交没有任何问题（默认不显示任何内容）
+  -V, --verbose        enable verbose output for reports without problems
+                                                                       [boolean]
+# 是否开启严格模式（2 表示警告，3表示错误）
+  -s, --strict         enable strict mode; result code 2 for warnings, 3 for
+                       errors                                          [boolean]
+# 通过一个外部文件来配置 commitlint 的 CLI 行为（而非规则）
+      --options        path to a JSON file or Common.js module containing CLI
+                       options
+# 显示 commitlint 版本
+  -v, --version        display version information                     [boolean]
+# 显示帮助内容
+  -h, --help           Show help                                       [boolean]
+```
+
+## 配置
+
+使用 `commitlint.config.js` 文件或在 `package.json` 中配置 `commitlint` 字段。
+
+配置对象示例：
+
+```jsx
+const Configuration = {
+	extends: ["@commitlint/config-convertional"],
+	parserPreset: "convertional-changelog-atom,
+	formatter: "@commitlint/format",
+	rules: {
+		"type-enum": [2, "alway", ["foo"]]
+	},
+	ignores: [(commit) => commit === ""],
+	defaultIgnores: true,
+	helpUrl: "https://github.com/conventional-changelog/commitlint/#what-is-commitlint",
+	prompt: {
+		message: {},
+		questions: {
+			type: {
+				description: "please input type:",
+			}
+		}
+	}
+}
+
+export default Configuration;
+```
+
+### Typescript 配置
+
+从 `@commitlint/types` 导入相关类型和枚举。
+
+示例：
+
+```jsx
+import type { UserConfig } from "@commitlint/types";
+import { RuleConfigSeverity } from "@commitlint/types";
+
+const Configuration: UserConfig = {
+  extends: ["@commitlint/config-conventional"],
+  parserPreset: "conventional-changelog-atom",
+  formatter: "@commitlint/format",
+  rules: {
+    "type-enum": [RuleConfigSeverity.Error, "always", ["foo"]], // ❓为什么可以这么写
+  },
+};
+```
+
+### 使用共享配置进行扩展
+
+方式：
+
+- 在配置文件的 extends 字段中添加数组项
+- 在命令行中使用 `commitlint --extends [ex1, ex2, ...]` 配置临时使用的扩展项。
+
+extends 字段中配置的第三方共享配置需要提前安装，也可以配置本地的共享配置。
+
+### 解析器预设（parserPreset）
+
+用于解析 commit msg
+
+示例：
+
+```jsx
+export default {
+  // ...
+  parserPreset: "conventional-changelog-atom",
+  // ...
+};
+```
+
+方式：
+
+- 配置文件的 `parserPreset` 字段配置
+- 命令行使用 `-p, --parser-preset`
+
+可以配置第三方包和本地文件。
+
+### 格式化程序（formatter）
+
+格式化 commitlint 的输出内容。
+
+示例:
+
+```jsx
+export default {
+  formatter: "@commitlint/format",
+};
+```
+
+方式：
+
+- 配置文件的 `formatter` 字段
+- 命令行使用 `-o, --format`
+
+## 规则配置
+
+在配置文件的 `rules` 对象中进行配置。每个配置规则由名称（属性）和配置数组（值）组成。
+
+配置数组包含：
+
+```
+- 错误级别。取值[0, 2]。
+    - 0 —— 禁用规则
+    - 1 —— 警告
+    - 2 —— 错误
+- 规则适用。取值：
+    - `always` —— 适用
+    - `never` —— 反转规则
+- 值
+```
+
+每个规则的值可以为数组，也可以为一个函数，函数返回类型为 `Array` 或 `Promise<Array>` 。
+
+示例：
+
+```js
+export default {
+  rules: {
+    "header-max-length": [0, "always", 72],
+  },
+};
+```
+
+```js
+export default {
+  rules: {
+    "header-max-length": () => [0, "always", 72],
+  },
+};
+```
+
+```js
+export default {
+  rules: {
+    "header-max-length": async () => [0, "always", 72],
+  },
+};
+```
+
+## 规则（Rules）
+
+[https://commitlint.nodejs.cn/reference/rules.html](https://commitlint.nodejs.cn/reference/rules.html)
+
+## 使用插件（Plugin）
+
+插件用于扩展（自定义）规则，你可以自定义自己的插件。
+
+## 提示（Prompt）
+
+默认使用@commitlint/cz-commitlint 配置提示。
+
+prompt 属性包含三个字段：settings、messages、questions，需要在 commitlint 配置文件中进行 prompt 配置。
+
+##### 官方示例
+
+```js
+export default {
+  parserPreset: 'conventional-changelog-conventionalcommits',
+      rules: {
+        // ...
+      },
+      prompt: {
+        settings: {},
+        messages: {
+          skip: ':skip',
+          max: 'upper %d chars',
+          min: '%d chars at least',
+          emptyWarning: 'can not be empty',
+          upperLimitWarning: 'over limit',
+          lowerLimitWarning: 'below limit'
+        },
+        questions: {
+          type: {
+            description: "Select the type of change that you're committing:",
+            enum: {
+              feat: {
+                description: 'A new feature',
+                title: 'Features',
+                emoji: '✨',
+              },
+              fix: {
+                description: 'A bug fix',
+                title: 'Bug Fixes',
+                emoji: '🐛',
+              },
+              docs: {
+                description: 'Documentation only changes',
+                title: 'Documentation',
+                emoji: '📚',
+              },
+              style: {
+                description: 'Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)',
+                title: 'Styles',
+                emoji: '💎',
+              },
+              refactor: {
+                description: 'A code change that neither fixes a bug nor adds a feature',
+                title: 'Code Refactoring',
+                emoji: '📦',
+              },
+              perf: {
+                description: 'A code change that improves performance',
+                title: 'Performance Improvements',
+                emoji: '🚀',
+              },
+              test: {
+                description: 'Adding missing tests or correcting existing tests',
+                title: 'Tests',
+                emoji: '🚨',
+              },
+              build: {
+                description: 'Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)',
+                title: 'Builds',
+                emoji: '🛠',
+              },
+              ci: {
+                description: 'Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)',
+                title: 'Continuous Integrations',
+                emoji: '⚙️',
+              },
+              chore: {
+                description: "Other changes that don't modify src or test files",
+                title: 'Chores',
+                emoji: '♻️',
+              },
+              revert: {
+                description: 'Reverts a previous commit',
+                title: 'Reverts',
+                emoji: '🗑',
+              },
+            },
+          },
+          scope: {
+            description:
+              'What is the scope of this change (e.g. component or file name)',
+          },
+          subject: {
+            description: 'Write a short, imperative tense description of the change',
+          },
+          body: {
+            description: 'Provide a longer description of the change',
+          },
+          isBreaking: {
+            description: 'Are there any breaking changes?',
+          },
+          breakingBody: {
+            description:
+              'A BREAKING CHANGE commit requires a body. Please enter a longer description of the commit itself',
+          },
+          breaking: {
+            description: 'Describe the breaking changes',
+          },
+          isIssueAffected: {
+            description: 'Does this change affect any open issues?',
+          },
+          issuesBody: {
+            description:
+              'If issues are closed, the commit requires a body. Please enter a longer description of the commit itself',
+          },
+          issues: {
+            description: 'Add issue references (e.g. "fix #123", "re #123".)',
+          },
+        },
+      }
+};
+```
+
+可以使用 commitizen + cz-git 对交互式提示进行功能增强。（配置项更多了，具体配置见 cz-git 官方文档）
+
+## 源码
+
+使用 pnpm 创建多包项目：
+
+[https://pnpm.io/zh/workspaces](https://pnpm.io/zh/workspaces)
+
+示例：
+
+![Description](/images/commitlint_2.png)
+
+![Description](/images/commitlint_3.png)
+
+### 创建多包项目的方式：
+
+- pnpm
+- lerna
+- turboropo（最佳实践）
+- nx
+- rust（企业级）
+- Bazel/Buck/Pants
+
+### 源码分析：
+
+主要功能都在 `@commitlint` 目录下：（通过 lerna 创建的多包项目）
+
+**cli** —— 命令行工具（脚手架）
+
+- 命令配置（第三方包 yargs）
+- 根据命令行输入，解析参数，对参数做不同处理，得到 flags 对象
+- 调用 **`read`** 读取历史提交信息（commit msg）
+- 调用 **`load`** 等方法进行配置的合并
+- 调用 **`lint`** 方法，传入 commit message、load 整合的 rules、整合的 lint 配置对象。这步就正式对 commit message 进行 lint，最终返回 lint 的结果
+- 将 lint 的结果通过 **`format`** 格式化输出。
+
+**lint** —— lint commit message
+
+- 通过调用 **`parse`** 解析 commit message，成为格式统一的对象
+- 规则过滤：配置错误的、不能执行的、等级为 0 的规则，得到真正需要 lint 的规则
+- 根据传入的配置对象，如果有额外的 plugin，将 plugin 中的自定义规则加入到默认的 **`rules`**
+- 根据过滤后的规则配置获取到 **`rules`** 中对应的处理函数，将解析后的 commit message 对象一一传入处理函数执行，返回执行结果。
+
+**parse** —— 解析 commit message 以供 lint 使用（默认使用第三方包 conventional-commits-parser 进行解析，解析依据标准默认使用 conventional-changelog-angular，你也可以提供其他语法解析规则，例如：conventional-changelog-conventionalcommits）
+
+**load** —— 处理配置对象
+
+- 验证配置文件中规则配置是否符合配置格式（第三方包 ajv）
+- 合并命令行、package.json 中 `commitlint` 字段、 `commitlint.config.js` 配置文件中的配置
+- 调用 **`execute-rule`** ，传入合并后的配置对象，因为配置规则可能为一个数组也可能为一个函数，如果是数组则处理成函数（统一化处理，方便后续过滤判断）
+- 扩展包的配置合并处理等，最终返回处理后的配置对象。
+
+**rules** —— 规则配置和规则执行。每个规则对应一个执行函数，用于判断解析后的 commit message 对象是否符合规则。
+
+**read** —— 读取提交信息，流式输出
+
+**format** —— 格式化 lint 输出，commitlint 默认的 formatter
+
+**prompt 和 prompt-cli** —— 提供交互式命令功能
+
+**cz-commitlint** —— 提供的一种更现代的交互方式，是交互式提示基座的适配器
+
+**core** —— 导出 format、load、lint、read 方法以供外部使用
+
+![Description](/images/commitlint_4.png)
+
+依赖包：
+
+- [yargs](https://yargs.js.org/) —— 配置命令行可用命令，以便后续处理（类似的包如：commander）
+- chalk —— 终端颜色配置
+- tinyexec（—> cross-spawn —> node:child_process） —— 执行命令
+
+### 设置 commitlint 脚本执行文件：
+
+![Description](/images/commitlint_5.png)
+
+该文件路径最终会设置到 `.node_modules/.bin/commitlint` 脚本文件中用于执行：
+
+![alt text](/images/commitlint_7.png)
+
+因此该文件需要配置脚本执行环境：
+
+![Description](/images/commitlint_6.png)
+
+## [约定式提交规范（1.0.0）](https://www.conventionalcommits.org/zh-hans/v1.0.0-beta.4/)
+
+（commitlint 默认使用的是 angular 的提交规范，但也提供了多种规范以供使用）
+
+### 语法
+
+    ```
+    **<type>([optional scope]): <description>
+    [optional body]
+    [optional footer(s)]**
+    ```
+
+#### 类型（type）
+
+    - feat —— 新增功能**（对应 Semver 的 MINOR）**
+    - fix —— 修复 bug **（对应 Semver 的 PATCH）**
+    - docs —— 更改文档
+    - style —— 不影响代码含义的变化（如空格、格式化、缺少分号等）
+    - refactor —— 代码重构，既不修复错误也不添加功能
+    - perf —— 提升性能的代码更改
+    - test —— 测试代码更改
+    - build —— 构建系统或外部依赖关系的更改
+    - ci —— 持续集成文件和脚本的更改
+    - chore —— 其他修改（不修改 src 或 test 文件）
+    - revert —— commit 回退
+
+#### 范围（scope）
+
+    为提交类型添加一个使用圆括号包裹的作用域，以为其提供额外的上下文信息。例： `feat(parser): add ability to parse arrays.`
+
+#### BREAKING CHANGE（footer）
+
+    破坏性 API 变更**（对应 Semver 的 MAJOR）**
+
+### 规则
+
+- 每个提交都必须使用类型（type）字段前缀，其后接一个可选的作用域字段，以及一个必要的冒号（英文半角）和空格。
+- 当一个提交为应用或类库实现了新特性时，必须使用 `feat` 类型。
+- 当一个提交为应用修复了 bug 时，必须使用 `fix` 类型。
+- 作用域必须是一个描述某部分代码的名词，并用圆括号包围。例如 `fix(parser):`
+- 描述字段（description）必须紧跟在类型/作用域前缀的空格之后。是对代码变更的简短总结。
+- 在简短描述之后，可以编写更长的提交正文（body），为代码变更提更额外的上下文信息。正文必须起始于描述字段结束的一个空行后。
+- 在正文结束的一个空行之后，可以编写一行或多行脚注（footer）。脚注必须包含关于提交的元信息。例如：关联的合并请求、Reviewer、破坏性变更（BREAKING CHANGE），每条元信息占据一行。
+- 破坏性变更必须标示在正文区域最开始处，或者脚注区域中某一行的开始。一个破坏性变更必须包含大写的文本 `BREAKING CHANGE` ，后面紧跟冒号和空格。其后必须提供对 API 变更的描述。
+- **可以在类型/作用域前缀之后， `:` 之前，添加 `!` ，以进一步提醒注意破坏性变更。当有 `!` 前缀时，正文或脚注内必须包含 `BREAKING CHANGE: description`**
+
+### 示例
+
+```
+1.包含了描述以及正文内有破坏性变更的提交说明：
+feat: allow provided config object to extend other configs
+
+BREAKING CHANGE: `extends` key in config file is now used for extending other config files
+
+2.包含了可选的 ! 字符以提醒注意破坏性变更的提交说明：
+chore!: drop Node 6 from testing matrix
+
+BREAKDING CHANGE: dropping Node 6 which hits end of life in April
+
+3.不包含正文的提交说明
+docs: correct spelling of CHANGELOG
+
+4.包含作用域的提交说明
+feat(lang): add polish language
+
+5.为 fix 编写的提交说明，包含（可选的）issue 编号
+fix: correct minor typos in code
+
+see the issue for details on the typos fixed
+
+close issue #12
+```
+
+### **为什么使用约定式提交**
+
+- 自动化生成更新日志（CHANGELOG，就是约定式提交的格式内容）
+- **基于提交的类型，自动决定语义化版本的变更。**
+- 触发构建和部署流程。
+
+### 其他
+
+（1）[Semver](https://semver.org/lang/zh-CN/)
+
+（2）[Angular 约定式提交规范](https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit?tab=t.0#heading=h.greljkmo14y0)（基本上规范都是依照这个来的，可以学习一下）
+
+[angular/commit-message-guidelines](https://github.com/angular/angular/blob/22b96b9/CONTRIBUTING.md#-commit-message-guidelines)
+
+（3）[conventional-changelog](https://github.com/conventional-changelog) 这是一个多包项目，里面有多种配置好的规范，是一个 CLI 工具。
+
+[conventional-changelog-conventionalcommints](https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-changelog-conventionalcommits)
+conventional-changelog 提供的其中一个 commit 语法解析规则。
+
+**安装**
+
+```bash
+npm i -D conventional-changelog-conventionalcommits
+```
+
+**间接使用**
+
+如果安装了整个 `conventional-changelog` 包，则可以通过 `changelog -p` CLI 使用某个规范包。
+
+**直接使用**
+
+[conventional-changelog-parser](https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-commits-parser) 对 commit message 进行解析处理，将 changelog 转换为对象。（commitlint 使用该包实现 parse）
+
+**通常通过交互式命令可以得到一个 commit message 字符串，如果要对 commit message 进行校验（lint），需要将字符串进行转换。**
+
+示例：
+
+```
+'feat(scope): broadcast $destroy event on scope destruction
+Closes #1'
+```
+
+转换后：
+
+```js
+{
+  type: 'feat',
+  scope: 'scope',
+  subject: 'broadcast $destroy event on scope destruction',
+  merge: null,
+  header: 'feat(scope): broadcast $destroy event on scope destruction',
+  body: null,
+  footer: 'Closes #1',
+  notes: [],
+  references: [{
+    action: 'Closes',
+    owner: null,
+    repository: null,
+    issue: '1',
+    raw: '#1',
+    prefix: '#'
+  }],
+  mentions: [],
+  revert: null
+}
+```
