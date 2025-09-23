@@ -3,7 +3,7 @@
 
 // 引入主题的默认样式
 @import "{{ site.theme }}";
-body {
+body, h1, h2, h3, h4, h5, h6 {
   color: #111112;
 }
 // 自定义样式
@@ -15,11 +15,12 @@ a:visited {
   transition: all 0.1s;
 }
 a:hover {
+  font-weight: normal;
   text-decoration: underline #000050;
 }
 
 ul {
-  list-style-type: "▫️";
+  list-style-type: "\2022";
 }
 
 // 用户头像
@@ -45,11 +46,29 @@ h1.title {
 // 文章图片
 p img {
   box-shadow: 0px 0px 10px #f5f5f5;
-  border-radius: 20px;
+  border-radius: 16px;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+// 引用块
+blockquote {
+  font-style: normal;
+  color: #3c3c3c;
 }
 
 @media screen and (max-width: 480px) {
-  .avatar {
-    width: 50px;
+  .title {
+    display: inline-block;
   }
+  .avatar {
+    width: 40px;
+    vertical-align: bottom;
+  }
+}
+
+// 文章底部导航
+.post-navigation {
+  background: #f3f4f6;
+  padding: 10px 12px;
 }
