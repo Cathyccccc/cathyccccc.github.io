@@ -15,28 +15,32 @@
   <body>
     <div class="wrapper">
       <h1>{{ page.title }}</h1>
-      <small>{{ page.date | date: "%-d %B %Y" }}</small>
+      <p>
+        <small>{{ page.date | date: "%-d %B %Y" }}</small>
 
-      {% if page.tags %}
-      <small>Tags: <code>{{ page.tags | join(" - ") }}</code></small>
-      {% endif %}
+        {% if page.tags %}
+        <small>Tags: <code class="tag">{{ page.tags | join(" - ") }}</code></small>
+        {% endif %}
+      </p>
+
+      <hr>
 
       {{content}}
 
-      <footer class="post-navigation">
+      <div class="post-navigation">
         {% if page.previous %} 
         <a href="{{ page.previous.url | relative_url }}">
           <small>← 上一篇：</small>
           {{ page.previous.title }}</a>
         {% endif %}
-
+        <br>
         {% if page.next %} |
         <a href="{{ page.next.url | relative_url }}">
           <small>下一篇: →</small>
           {{ page.next.title }}
         </a>
         {% endif %}
-      </footer>
+      </div>
     </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
   </body>

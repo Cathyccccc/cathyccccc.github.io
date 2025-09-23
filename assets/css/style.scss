@@ -1,4 +1,18 @@
 ---
 ---
 
-@import "jekyll-theme-minimal";
+// 引入主题的默认样式
+@import "{{ site.theme }}";
+
+// 自定义样式
+body {
+  background-color: blue;
+}
+
+a {
+  color: #111112;
+}
+
+.tag {
+  box-shadow: inset 2px 2px #000;
+}

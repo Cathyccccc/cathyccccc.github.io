@@ -16,3 +16,5 @@ description:
 # show_downloads: true
 # google_analytics:
 theme: jekyll-theme-minimal
+sass:
+  sass_dir: /assets/css/style.scss
