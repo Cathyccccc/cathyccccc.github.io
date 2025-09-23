@@ -12,13 +12,13 @@ body, h1, h2, h3, h4, h5, h6 {
 a,
 a:link,
 a:visited {
-  color: #000080;
+  color: #1e40af;
   text-underline-offset: 3px;
   transition: all 0.1s;
 }
 a:hover {
   font-weight: normal;
-  text-decoration: underline #0000aa;
+  text-decoration: underline #1e40af;
 }
 
 ul {
@@ -52,20 +52,21 @@ h1.title {
 
 // 文章图片
 p img {
-  box-shadow: 0px 0px 8px #f5f5f5;
+  box-shadow: 0px 0px 5px #eee;
   border-radius: 14px;
   padding: 8px;
+  box-sizing: border-box;
 }
 
 // 引用块
 blockquote {
   font-style: normal;
-  color: #4c4c4c;
+  color: #6b7280;
 }
 
 // 代码块
 code, pre {
-  font-family: Consolas;
+  font-family: Consolas, Monaco, Bitstream Vera Sans Mono, Lucida Console, Terminal, Liberation Mono, DejaVu Sans Mono, Courier New, monospace;
 }
 
 pre {
