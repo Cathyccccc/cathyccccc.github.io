@@ -18,12 +18,12 @@
       <small>{{ page.date | date: "%-d %B %Y" }}</small>
 
       {% if page.tags %}
-      <small>tags: <code>{{ page.tags | join(" - ") }}</code></small>
+      <small>Tags: <code>{{ page.tags | join(" - ") }}</code></small>
       {% endif %}
 
       {{content}}
 
-      <div class="post-navigation">
+      <footer class="post-navigation">
         {% if page.previous %} 
         <a href="{{ page.previous.url | relative_url }}">
           <small>← 上一篇：</small>
@@ -36,7 +36,7 @@
           {{ page.next.title }}
         </a>
         {% endif %}
-      </div>
+      </footer>
     </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
   </body>
