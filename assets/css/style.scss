@@ -35,9 +35,18 @@ a:hover {
   text-decoration: underline #1e40af;
 }
 
+ol {
+  padding-inline-start: 20px;
+}
+
 ul {
   padding-inline-start: 10px;
   list-style-type: "\2022";
+}
+
+ul ul {
+  padding-inline-start: 20px;
+  list-style-type: "\25E6";
 }
 
 li {
@@ -56,6 +65,11 @@ h1.title {
   margin-bottom: 5px;
 }
 
+// 文章日期、标签
+.article-desc {
+  color: #6b7280;
+}
+
 // 文章标签
 .tag {
   background: linear-gradient(0deg, #00000010, transparent, #00000010 100%);
@@ -70,6 +84,8 @@ p img {
   border-radius: 14px;
   padding: 8px;
   box-sizing: border-box;
+  min-height: 40px;
+  object-fit: contain;
 }
 
 // 引用块
@@ -85,6 +101,8 @@ code, pre {
 
 pre {
   border: none;
+  padding: 8px 12px;
+  border-radius: none;
 }
 
 // 文章底部导航
@@ -96,6 +114,9 @@ pre {
 @media screen and (max-width: 480px) {
   .title {
     display: inline-block;
+  }
+  .article-title {
+    font-size: 24px;
   }
   .avatar {
     width: 40px;
