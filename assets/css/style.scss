@@ -3,16 +3,53 @@
 
 // 引入主题的默认样式
 @import "{{ site.theme }}";
-
-// 自定义样式
 body {
-  background-color: blue;
-}
-
-a {
   color: #111112;
 }
+// 自定义样式
+a,
+a:link,
+a:visited {
+  color: #111112;
+  text-underline-offset: 3px;
+  transition: all 0.1s;
+}
+a:hover {
+  text-decoration: underline #000050;
+}
 
+ul {
+  list-style-type: "▫️";
+}
+
+// 用户头像
+.avatar {
+  width: 200px;
+  border-radius: 50%;
+  border: 1px solid #eee;
+}
+
+// 文章标题
+h1.title {
+  margin-bottom: 5px;
+}
+
+// 文章标签
 .tag {
-  box-shadow: inset 2px 2px #000;
+  background: linear-gradient(0deg, #00000010, transparent, #00000010 100%);
+  border-radius: 3px;
+  box-shadow: inset 0px 0px 2px #00000010;
+  padding: 2px 8px;
+}
+
+// 文章图片
+p img {
+  box-shadow: 0px 0px 10px #f5f5f5;
+  border-radius: 20px;
+}
+
+@media screen and (max-width: 480px) {
+  .avatar {
+    width: 50px;
+  }
 }

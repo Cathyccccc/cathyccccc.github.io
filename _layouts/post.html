@@ -16,10 +16,10 @@
     <div class="wrapper">
       <h1>{{ page.title }}</h1>
       <p>
-        <small>{{ page.date | date: "%-d %B %Y" }}</small>
+        <small>{{ page.date | date: "%Y年%m月%d日" }}</small>
 
         {% if page.tags %}
-        <small>Tags: <code class="tag">{{ page.tags | join(" - ") }}</code></small>
+        <small>Tags: <small class="tag">{{ page.tags | join(" | ") }}</small></small>
         {% endif %}
       </p>
 

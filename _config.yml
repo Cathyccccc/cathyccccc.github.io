@@ -6,7 +6,7 @@ highlighter: rouge
 gist:
   noscript: false
 # kramdown:
-markdown: GEM
+markdown: GFM
 highlighter: rouge
 profile: true
 
@@ -16,5 +16,3 @@ description:
 # show_downloads: true
 # google_analytics:
 theme: jekyll-theme-minimal
-# sass:
-#   sass_dir: /assets/css/style.scss
